@@ -1,0 +1,27 @@
+body {
+  margin: 50px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #e0ffff;
+}
+
+.box {
+  height: 100px;
+  width: 100px;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 500px;
+  margin: 30px;
+}
+
+img {
+  height: 100px;
+  width: 100px;
+}

@@ -1,0 +1,19 @@
+body {
+  margin: 50px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #e0ffff;
+}
+
+h2 {
+  color: #9acd32;
+  margin: 0;
+}
+
+img.img-zamek {
+  height: 468px;
+  margin-top: 50px;
+}
