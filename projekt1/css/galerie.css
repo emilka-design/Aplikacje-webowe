@@ -1,0 +1,107 @@
+.naglowek-galerii {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 48px 20px 32px;
+}
+
+.naglowek-galerii h1 {
+  font-size: 2.5rem;
+  margin: 0;
+  text-align: center;
+}
+
+.powrot {
+  font-size: 2rem;
+  line-height: 1;
+  text-decoration: none;
+  color: var(--akcent);
+  padding: 4px 10px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.powrot:hover {
+  background-color: var(--tlo-naglowka);
+}
+
+.galeria-zdjec {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto 60px;
+  padding: 0 20px;
+}
+
+.zdjecie {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  aspect-ratio: 3 / 2;
+}
+
+.zdjecie img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.zdjecie figcaption {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(49, 92, 75, 0.55);
+  color: #ffffff;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.zdjecie:hover figcaption {
+  opacity: 1;
+}
+
+.zdjecie:hover img {
+  transform: scale(1.05);
+}
+
+@media (max-width: 900px) {
+  .galeria-zdjec {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 550px) {
+  .galeria-zdjec {
+    grid-template-columns: 1fr;
+  }
+}
+
+.film {
+  max-width: 900px;
+  margin: 50px auto 0;
+}
+
+.film video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background-color: #000;
+  margin-bottom: 40px;
+}
+
+/*.film figcaption {
+  margin-top: 12px;
+  margin-bottom: 7px;
+  font-style: italic;
+  color: var(--akcent);
+}*/
