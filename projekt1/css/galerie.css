@@ -99,9 +99,9 @@
   margin-bottom: 40px;
 }
 
-/*.film figcaption {
+.film figcaption {
   margin-top: 12px;
   margin-bottom: 7px;
   font-style: italic;
   color: var(--akcent);
-}*/
+}
