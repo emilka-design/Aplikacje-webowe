@@ -67,14 +67,14 @@
   margin-bottom: 16px;
 }
 
-.zdjecie-w-tekscie.prawo {
-  float: right;
-  margin-left: 28px;
-}
-
 .zdjecie-w-tekscie.lewo {
   float: left;
   margin-right: 28px;
+}
+
+.zdjecie-w-tekscie.prawo {
+  float: right;
+  margin-left: 28px;
 }
 
 .galeria-wpisu {
