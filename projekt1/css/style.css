@@ -227,12 +227,12 @@
   transition: background-color 0.2s ease;
 }
 
-#formularz-kontaktowy input[type="submit"]:hover {
-  background-color: #252d28;
-}
-
 #komunikat-formularza {
   text-align: center;
+}
+
+#formularz-kontaktowy input[type="submit"]:hover {
+  background-color: #252d28;
 }
 
 @media (max-width: 900px) {
