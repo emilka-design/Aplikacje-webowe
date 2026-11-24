@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stoper</title>
+    <link rel="stylesheet" href="../css/style2.css" />
+  </head>
+
+  <body>
+    <h1>Generator Haseł</h1>
+    <div>
+      <label for="min">Minimalna długość hasła:</label>
+      <input type="number" id="min" />
+    </div>
+
+    <div>
+      <label for="max">Maksymalna długość hasła:</label>
+      <input type="number" id="max" />
+    </div>
+
+    <div>
+      <input type="checkbox" id="wielkie" />
+      <label for="wielkie">Wielkie litery</label>
+    </div>
+
+    <div>
+      <input type="checkbox" id="specjalne" />
+      <label for="specjalne">Znaki specjalne</label>
+    </div>
+
+    <button type="button" id="generuj">Wygeneruj hasło</button>
+
+    <script src="../js/zad2.js"></script>
+  </body>
+</html>
