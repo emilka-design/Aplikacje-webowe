@@ -24,8 +24,6 @@ const flapSound = new Audio("assets/Sound Efects/wing.wav");
 const pointSound = new Audio("assets/Sound Efects/point.wav");
 const hitSound = new Audio("assets/Sound Efects/hit.wav");
 const dieSound = new Audio("assets/Sound Efects/die.wav");
-const music = new Audio("assets/music.mp3");
-music.loop = true;
 
 function playSound(sound) {
   sound.currentTime = 0;
@@ -38,6 +36,10 @@ let pipes;
 let score;
 let frames;
 let groundX;
+let speed = SPEED;
+let boosts = [];
+let ghostTime = 0;
+let fastTarget = 0;
 
 function resetGame() {
   bird = { x: 60, y: 200, width: 34, height: 24, speed: 0, img: 0 };
@@ -45,6 +47,10 @@ function resetGame() {
   score = 0;
   frames = 0;
   groundX = 0;
+  speed = SPEED;
+  boosts = [];
+  ghostTime = 0;
+  fastTarget = 0;
 }
 
 function updateBird() {
@@ -62,6 +68,7 @@ function drawBird() {
   let angle = bird.speed * 0.1;
   if (angle < -0.5) angle = -0.5;
   if (angle > 1.57) angle = 1.57;
+  if (state === "record") angle = frames * 0.2;
 
   ctx.save();
   ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
@@ -80,15 +87,22 @@ function addPipe() {
     bottom: top + gap,
     passed: false,
   });
+  if (Math.random() < 0.3) {
+    boosts.push({
+      x: canvas.width + 26,
+      y: top + gap / 2,
+      type: Math.random() < 0.5 ? "ghost" : "fast",
+    });
+  }
 }
 
 function updatePipes() {
-  if (frames % 90 === 0) {
+  const last = pipes[pipes.length - 1];
+  if (!last || last.x < canvas.width - 180) {
     addPipe();
   }
-
   pipes.forEach((pipe) => {
-    pipe.x -= SPEED;
+    pipe.x -= speed;
 
     if (!pipe.passed && pipe.x + pipe.width < bird.x) {
       pipe.passed = true;
@@ -101,6 +115,7 @@ function updatePipes() {
 }
 
 function drawPipes() {
+  if (ghostTime > 0) ctx.globalAlpha = 0.4;
   pipes.forEach((pipe) => {
     ctx.save();
     ctx.translate(pipe.x, pipe.top);
@@ -110,6 +125,46 @@ function drawPipes() {
 
     ctx.drawImage(pipeImg, pipe.x, pipe.bottom);
   });
+  ctx.globalAlpha = 1;
+}
+
+function updateBoosts() {
+  boosts.forEach((boost) => {
+    boost.x -= speed;
+
+    const dx = bird.x + bird.width / 2 - boost.x;
+    const dy = bird.y + bird.height / 2 - boost.y;
+    if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
+      boost.taken = true;
+      if (boost.type === "ghost") ghostTime = 300;
+      if (boost.type === "fast") fastTarget = score + 3;
+    }
+  });
+
+  boosts = boosts.filter((boost) => !boost.taken && boost.x > -20);
+}
+
+function drawBoosts() {
+  boosts.forEach((boost) => {
+    ctx.fillStyle = boost.type === "ghost" ? "lightblue" : "orange";
+    ctx.beginPath();
+    ctx.arc(boost.x, boost.y, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "black";
+    ctx.font = "bold 12px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(boost.type === "ghost" ? "G" : "F", boost.x, boost.y + 4);
+  });
+}
+
+function flyToGap() {
+  const next = pipes.find((pipe) => pipe.x + pipe.width > bird.x);
+  if (next) {
+    const target = (next.top + next.bottom) / 2 - bird.height / 2;
+    bird.y += (target - bird.y) * 0.2;
+  }
+  bird.speed = 0;
 }
 
 function hitPipe() {
@@ -138,6 +193,11 @@ function drawScore() {
   ctx.font = "bold 32px Arial";
   ctx.textAlign = "right";
   ctx.fillText(score, canvas.width - 10, 40);
+  if (ghostTime > 0) {
+    ctx.font = "bold 16px Arial";
+    ctx.textAlign = "left";
+    ctx.fillText("Duch: " + Math.ceil(ghostTime / 60) + "s", 10, 30);
+  }
 }
 
 function gameLoop() {
@@ -146,15 +206,24 @@ function gameLoop() {
     animateBird();
     moveGround();
   }
-
   if (state === "playing") {
     frames++;
-    updateBird();
+    speed = fastTarget > 0 ? SPEED * 6 : SPEED;
+
+    if (fastTarget > 0) {
+      flyToGap();
+    } else {
+      updateBird();
+    }
     animateBird();
     updatePipes();
+    updateBoosts();
     moveGround();
 
-    if (hitPipe()) {
+    if (ghostTime > 0) ghostTime--;
+    if (fastTarget > 0 && score >= fastTarget) fastTarget = 0;
+
+    if (hitPipe() && ghostTime === 0 && fastTarget === 0) {
       playSound(hitSound);
       state = "falling";
       bird.speed = 0;
@@ -172,9 +241,12 @@ function gameLoop() {
       gameOver();
     }
   }
-
+  if (state === "record") {
+    frames++;
+  }
   drawBackground();
   drawPipes();
+  drawBoosts();
   drawGround();
   drawBird();
   if (state !== "start") {
@@ -185,7 +257,7 @@ function gameLoop() {
 }
 
 function moveGround() {
-  groundX -= SPEED;
+  groundX -= speed;
   if (groundX <= -24) {
     groundX = 0;
   }
@@ -198,8 +270,6 @@ function onKeyDown(event) {
   if (state === "start") {
     document.getElementById("start-screen").classList.add("hidden");
     state = "playing";
-    music.currentTime = 0;
-    music.play();
   }
 
   if (state === "playing") {
@@ -218,9 +288,11 @@ function saveScore(newScore) {
 }
 
 function gameOver() {
-  state = "gameover";
-  music.pause();
   document.removeEventListener("keydown", onKeyDown);
+
+  const oldScores = JSON.parse(localStorage.getItem("top5")) || [];
+  const isRecord =
+    score > 0 && (oldScores.length === 0 || score > oldScores[0]);
 
   const top5 = saveScore(score);
 
@@ -235,6 +307,23 @@ function gameOver() {
     list.appendChild(li);
   });
 
+  if (isRecord) {
+    document.getElementById("gameover-title").textContent =
+      "Gratulacje! Nowy rekord!";
+    state = "record";
+    frames = 0;
+    bird.x = canvas.width / 2 - bird.width / 2;
+    bird.y = canvas.height / 2 - 60;
+    setTimeout(showGameOverScreen, 3000);
+  } else {
+    document.getElementById("gameover-title").textContent = "Game Over";
+    state = "gameover";
+    showGameOverScreen();
+  }
+}
+
+function showGameOverScreen() {
+  state = "gameover";
   document.getElementById("gameover-screen").classList.remove("hidden");
 }
 
